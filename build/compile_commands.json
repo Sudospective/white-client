@@ -1,7 +1,0 @@
-[
-{
-  "directory": "/home/sudospective/git/white-client/build",
-  "command": "/usr/bin/g++ -I/home/sudospective/git/white-client/src/lib/socket-cpp/Socket -g -o src/CMakeFiles/white-client.dir/main.cpp.o -c /home/sudospective/git/white-client/src/main.cpp",
-  "file": "/home/sudospective/git/white-client/src/main.cpp"
-}
-]

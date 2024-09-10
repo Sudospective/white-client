@@ -1,3 +1,5 @@
+add_subdirectory(lib)
+
 set(src
   main.cpp
 )

@@ -1,5 +1,0 @@
-/home/sudospective/git/white-client/build/CMakeFiles/edit_cache.dir
-/home/sudospective/git/white-client/build/CMakeFiles/rebuild_cache.dir
-/home/sudospective/git/white-client/build/src/CMakeFiles/white-client.dir
-/home/sudospective/git/white-client/build/src/CMakeFiles/edit_cache.dir
-/home/sudospective/git/white-client/build/src/CMakeFiles/rebuild_cache.dir
