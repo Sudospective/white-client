@@ -16,7 +16,7 @@
 #include <stdarg.h>       // va_start, etc.
 #include <stdexcept>
 
-#ifdef WINDOWS
+#ifdef WIN32
 #include <winsock2.h>
 #include <ws2tcpip.h>
 
