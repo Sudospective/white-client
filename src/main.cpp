@@ -8,14 +8,10 @@
 
 #include "TCPClient.h"
 
-struct Gift {
-  std::string ID;
-  std::string author;
-};
-
 int main() {
   std::mutex mutex;
-  Gift gift;
+
+  bool connected;
 
   std::vector<std::string> inputVec;
 
@@ -27,6 +23,7 @@ int main() {
   std::cout << "Connecting..." << std::endl;
 
   if (tcp.Connect("127.0.0.1", "8765")) {
+    connected = true;
     std::cout << "Connected." << std::endl;
     std::ofstream status("status.txt", std::ios::trunc);
     status << "connected" << std::endl;
@@ -45,31 +42,32 @@ int main() {
 
   std::function reader = [&]() {
     while (true) {
-      char input[1024] = {};
-      int read = tcp.Receive(input, 1024, false);
-      if (read < 0) {
+      if (connected) {
+        char input[1024] = {};
+        int readVal = tcp.Receive(input, 1024, false);
+        if (readVal < 0)
+          continue;
+        mutex.lock();
+        if (readVal == 0) {
+          std::cout << "Connection lost." << std::endl;
+          connected = false;
+        }
+        if (readVal > 0)
+          inputVec.push_back(std::string(input, 1024));
+        mutex.unlock();
         continue;
       }
-      if (read == 0) {
-        std::cout << "Connection lost." << std::endl;
-        std::ofstream status("status.txt", std::ios::trunc);
-        status << "inactive" << std::endl;
-        status.close();
-        tcp.Disconnect();
-      }
-      mutex.lock();
-      if (read > 0) {
-        std::string inputString = std::string(input, 1024);
-        inputVec.push_back(inputString);
-      }
-      mutex.unlock();
+      std::cout << "Disconnecting..." << std::endl;
+      std::ofstream status("status.txt", std::ios::trunc);
+      status << "inactive" << std::endl;
+      status.close();
+      tcp.Disconnect();
+      std::cout << "Disconnected." << std::endl;
       break;
     }
   };
 
   std::thread thread = std::thread(reader);
-
-  thread.join();
 
   while (true) {
     mutex.lock();
@@ -77,13 +75,12 @@ int main() {
     inputVec.clear();
     mutex.unlock();
     for (std::string input : inputs) {
-      nlohmann::json j = nlohmann::json::parse(input);
+      nlohmann::json j = nlohmann::json::parse(input.erase(input.find_first_of('\0')));
       int cmd = j["command"];
       std::cout << "Server sent command " << cmd << std::endl;
       std::ofstream output("receive.txt");
       output << j.dump() << std::endl;
       output.close();
-      break;
     }
 
     std::fstream send("send.txt", std::ios::in);
@@ -100,6 +97,8 @@ int main() {
       send.close();
     }
   }
+
+  thread.join();
 
   std::ofstream status("status.txt", std::ios::trunc);
   status << "inactive" << std::endl;
