@@ -25,19 +25,13 @@ int main() {
   if (tcp.Connect("127.0.0.1", "8765")) {
     connected = true;
     std::cout << "Connected." << std::endl;
-    std::ofstream status("status.txt", std::ios::trunc);
-    status << "connected" << std::endl;
-    status.close();
     nlohmann::json j;
-    j.emplace("command", 2);
-    j.emplace("message", "Hello");
+    j["command"] = 2;
+    j["message"] = "Hello";
     tcp.Send(j.dump());
   }
   else {
     std::cout << "Unable to connect to server." << std::endl;
-    std::ofstream status("status.txt", std::ios::trunc);
-    status << "inactive" << std::endl;
-    status.close();
   }
 
   std::function reader = [&]() {
@@ -58,9 +52,6 @@ int main() {
         continue;
       }
       std::cout << "Disconnecting..." << std::endl;
-      std::ofstream status("status.txt", std::ios::trunc);
-      status << "inactive" << std::endl;
-      status.close();
       tcp.Disconnect();
       std::cout << "Disconnected." << std::endl;
       break;
@@ -99,10 +90,6 @@ int main() {
   }
 
   thread.join();
-
-  std::ofstream status("status.txt", std::ios::trunc);
-  status << "inactive" << std::endl;
-  status.close();
 
   return 0;
 }
