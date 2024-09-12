@@ -20,6 +20,9 @@ int main() {
   };
   CTCPClient tcp(logger);
 
+  std::ofstream fileCleaner("receive.txt", std::ios::trunc);
+  fileCleaner.close();
+
   std::cout << "Connecting..." << std::endl;
 
   if (tcp.Connect("127.0.0.1", "8765")) {
