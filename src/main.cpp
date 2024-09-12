@@ -65,7 +65,16 @@ int main() {
     inputVec.clear();
     mutex.unlock();
     for (std::string input : inputs) {
-      nlohmann::json j = nlohmann::json::parse(input.erase(input.find_first_of('\0')));
+      nlohmann::json j;
+      try {
+        j = nlohmann::json::parse(input.erase(input.find_first_of('\0')));
+      }
+      catch (...) {
+        std::cout << "Error: invalid or malformed JSON." << std::endl;
+        continue;
+      }
+      if (j == nullptr)
+        continue;
       int cmd = j["command"];
       std::cout << "Server sent command " << cmd << std::endl;
       std::ofstream output("receive.txt");
@@ -80,9 +89,18 @@ int main() {
 
     if (!data.empty()) {
       // make sure its actually json
-      nlohmann::json j = nlohmann::json::parse(data);
+      nlohmann::json j;
+      try {
+        j = nlohmann::json::parse(data);
+      }
+      catch (...) {
+        std::cout << "Error: invalid or malformed JSON." << std::endl;
+        // gross hack to clear the file
+        send.open("send.txt", std::ios::out | std::ios::trunc);
+        send.close();
+        continue;
+      }
       tcp.Send(j.dump());
-      // gross hack to clear the file
       send.open("send.txt", std::ios::out | std::ios::trunc);
       send.close();
     }
