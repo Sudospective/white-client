@@ -28,10 +28,6 @@ int main() {
   if (tcp.Connect("127.0.0.1", "8765")) {
     connected = true;
     std::cout << "Connected." << std::endl;
-    nlohmann::json j;
-    j["command"] = 2;
-    j["data"]["message"] = "Hello";
-    tcp.Send(j.dump());
   }
   else {
     std::cout << "Unable to connect to server." << std::endl;
