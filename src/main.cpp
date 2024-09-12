@@ -30,7 +30,7 @@ int main() {
     std::cout << "Connected." << std::endl;
     nlohmann::json j;
     j["command"] = 2;
-    j["message"] = "Hello";
+    j["data"]["message"] = "Hello";
     tcp.Send(j.dump());
   }
   else {
